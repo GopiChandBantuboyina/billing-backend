@@ -69,18 +69,24 @@ public class SecurityConfig {
     }
 
     private UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+    CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setAllowCredentials(true);
+    config.setAllowedOrigins(List.of(
+        "http://localhost:5173",
+        "https://billing-frontend.vercel.app"
+    ));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
+    config.setAllowedMethods(List.of(
+        "GET","POST","PUT","DELETE","PATCH","OPTIONS"
+    ));
 
-    }
+    config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+    config.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}
 
 
 
