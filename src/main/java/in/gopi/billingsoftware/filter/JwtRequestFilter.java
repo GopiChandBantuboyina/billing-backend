@@ -34,15 +34,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		
+				String path = request.getServletPath();
 
-		String path = request.getServletPath();
-
-		// ✅ Skip JWT check for login
-		if (path.equals("/api/v1.0/login") || path.equals("/api/v1.0/encode")) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-
+    // ✅ context-path already removed
+    if (path.equals("/login") || path.equals("/encode")) {
+        filterChain.doFilter(request, response);
+        return;
+    }
 		final String authorizationHeader = request.getHeader("Authorization");
 		
 		String email = null;
