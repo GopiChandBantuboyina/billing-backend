@@ -34,39 +34,47 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            .cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
+    http
+        .cors(Customizer.withDefaults())
+        .csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(session ->
+            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers(
-                    "/api/v1.0/login",
-                    "/api/v1.0/encode"
-                ).permitAll()
+            // ✅ LOGIN (POST only)
+            .requestMatchers(
+                org.springframework.http.HttpMethod.POST,
+                "/api/v1.0/login"
+            ).permitAll()
 
-                .requestMatchers("/api/v1.0/uploads/**").permitAll()
+            .requestMatchers("/api/v1.0/encode").permitAll()
 
-                .requestMatchers(
-                    "/api/v1.0/categories",
-                    "/api/v1.0/items",
-                    "/api/v1.0/orders",
-                    "/api/v1.0/payments",
-                    "/api/v1.0/dashboard"
-                ).hasAnyRole("USER","ADMIN")
+            // ✅ PUBLIC
+            .requestMatchers("/api/v1.0/uploads/**").permitAll()
 
-                .requestMatchers("/api/v1.0/admin/**").hasRole("ADMIN")
+            // ✅ ADMIN
+            .requestMatchers("/api/v1.0/admin/**").hasRole("ADMIN")
 
-                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+            // ✅ USER + ADMIN
+            .requestMatchers(
+                "/api/v1.0/categories",
+                "/api/v1.0/items",
+                "/api/v1.0/orders",
+                "/api/v1.0/payments",
+                "/api/v1.0/dashboard"
+            ).hasAnyRole("USER","ADMIN")
 
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+            // ✅ PREFLIGHT
+            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
-        return http.build();
-    }
+            // 🔒 EVERYTHING ELSE
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
 
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
