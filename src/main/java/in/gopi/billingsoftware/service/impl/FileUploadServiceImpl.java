@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 public class FileUploadServiceImpl implements FileUploadService {
 
     private final String baseDir = "uploads/";
-    private final String serverUrl = "http://localhost:8080"; // Backend URL
+    private final String serverUrl = "https://billing-backend-zvtd.onrender.com"; // Backend URL
 
     @Override
     public String addFile(MultipartFile file, String moduleName) throws IOException {
